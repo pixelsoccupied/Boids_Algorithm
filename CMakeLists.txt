@@ -9,6 +9,9 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/local/lib)
 link_directories(/usr/local/lib)
 
+set(CMAKE_C_FLAGS “${CMAKE_C_FLAGS} -fopenmp -ltbb”)
+find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+
 
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -16,5 +19,5 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}  -framework OpenGL")
 
-set(SOURCE_FILES main.cpp Engine.cpp Engine.h Boid.cpp Boid.h Flock.cpp Flock.h)
+set(SOURCE_FILES main.cpp Engine.cpp Engine.h Boid.cpp Boid.h Flock.cpp Flock.h FlockPool.cpp FlockPool.h)
 add_executable(Boids_Algorithm ${SOURCE_FILES})

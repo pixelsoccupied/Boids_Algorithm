@@ -12,6 +12,7 @@
 #include <GLFW/glfw3.h>
 #include "Boid.h"
 #include "Flock.h"
+#include "FlockPool.h"
 
 
 class Engine {
@@ -20,7 +21,7 @@ public:
     static int SCREEN_HEIGHT;
     // static float getDT();
 
-    Engine();
+    Engine(int i);
     ~Engine();
 
     bool initialize(char* windowTitle);
@@ -31,24 +32,22 @@ public:
     static double limitFPS ;
 
     double lastTime = glfwGetTime(), timer = lastTime;
-    double deltaTime = 0, nowTime = 0;
+    double changeInTime = 0, currentTime = 0;
     int frames = 0 , updates = 0;
 
     std::mutex mtx;
     // bool init = true;
 
-    static void renderThread(Flock flock);
+    static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
+    static GLFWwindow *getWindow();
 
-private:
+    static void setWindow(GLFWwindow *window);
+
+public:
     static GLFWwindow* window;
+    FlockPool flockPool;
 
-    //  static float dt;
-    std::vector<std::thread*>threads;
-    std::vector<Flock> flock;
-
-
-    void startFlockThreads();
 };
 
 

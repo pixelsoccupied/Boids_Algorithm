@@ -8,16 +8,19 @@
 
 int Engine::SCREEN_WIDTH = 1024;
 int Engine::SCREEN_HEIGHT = 768;
-GLFWwindow* Engine::window = NULL;
+GLFWwindow *Engine::window = NULL;
 
 double Engine::limitFPS = 1.0 / 30.0;
 
-Engine::Engine() {
+Engine::Engine(int numOfFlocks) : flockPool(numOfFlocks) {
+
 
 }
 
 Engine::~Engine() {
 
+
+    std:: cout << " Window is closed!" << std::endl;
 
     glfwDestroyWindow(this->window);
     glfwTerminate();
@@ -26,18 +29,18 @@ Engine::~Engine() {
 
 bool Engine::initialize(char *windowTitle) {
 
-    if (!glfwInit())
-    {
-        std::cout << "Error initializing GLFW" <<std:: endl;
+    if (!glfwInit()) {
+        std::cout << "Error initializing GLFW" << std::endl;
         return false;
     }
 
     window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, windowTitle, NULL, NULL);
-    if (window == NULL)
-    {
+    if (window == NULL) {
         std::cout << "Error creating window" << std::endl;
         return false;
     }
+    glfwSetKeyCallback(window, key_callback);
+
 
     //GLFW Setup
     glfwMakeContextCurrent(window);
@@ -46,10 +49,12 @@ bool Engine::initialize(char *windowTitle) {
     glfwSwapInterval(1);
 
 
-    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     int xPos = (mode->width - SCREEN_WIDTH) / 2;
     int yPos = (mode->height - SCREEN_HEIGHT) / 2;
     glfwSetWindowPos(window, xPos, yPos);
+
+
 
 
     return true;
@@ -57,20 +62,18 @@ bool Engine::initialize(char *windowTitle) {
 
 void Engine::update() {
 
-    // - Measure time
-    nowTime = glfwGetTime();
-    deltaTime += (nowTime - lastTime) / limitFPS;
-    lastTime = nowTime;
+    //timer starts here
+    currentTime = glfwGetTime();
+    changeInTime += (currentTime - lastTime) / limitFPS;
+    lastTime = currentTime;
 
 
     glfwPollEvents();
+
 }
 
 
-
-
-void Engine::render(std::vector<Flock> flock){
-
+void Engine::render(std::vector<Flock> flock) {
 
 
     glClearColor(0.2, 0.3, 0.4, 0.5);
@@ -78,35 +81,30 @@ void Engine::render(std::vector<Flock> flock){
 
 
 
-    // - Only update at 30 frames / s
-    while (deltaTime >= 1.0){
-        //update();   // - Update function
-        for(int i =0; i<flock.size(); i++) {
-            Flock flock1 = flock[i];
-            std::thread* t = new std::thread (&Flock::updateBoid, flock1);
+    //30 frames
+    while (changeInTime >= 1.0) {
+        // Update function
+        for (auto &i : flock) {
+            //Flock flock1 = flock[i];
+            flockPool.work(std::bind(&Flock::updateBoid, i));
 
-            t->join();
-            //flock1.updateBoid();
         }
 
         updates++;
-        deltaTime--;
+        changeInTime--;
     }
 
 
-    for(int i =0; i<flock.size(); i++) {
-        Flock flock1 = flock[i];
-        for (int j=0; j <flock1.getFlock().size(); j++){
-            flock1.getFlock()[j]->drawBoid();
+    for (auto flock1 : flock) {
+        for (auto j : flock1.getFlock()) {
+            j->drawBoid();
         }
     }
 
     frames++;
-
     if (glfwGetTime() - timer > 1.0) {
-        timer ++;
+        timer++;
         //std::cout << "Thread vector size - " << threads.size() << std::endl;
-
         std::cout << "FPS: " << frames << " Updates:" << updates << std::endl;
         updates = 0, frames = 0;
     }
@@ -115,7 +113,19 @@ void Engine::render(std::vector<Flock> flock){
     glfwSwapBuffers(window);
 
 
+}
 
-
+void Engine::key_callback(GLFWwindow *window, int key, int scancode, int action, int mode) {
+    if (key == GLFW_KEY_ESCAPE || action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, 1);
 
 }
+
+GLFWwindow *Engine::getWindow() {
+    return window;
+}
+
+void Engine::setWindow(GLFWwindow *window) {
+    Engine::window = window;
+}
+

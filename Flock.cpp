@@ -8,7 +8,7 @@
 #include "Flock.h"
 using namespace Eigen;
 
-float Flock::rgb = 0.15;
+float Flock::rgb = 0.015;
 
 std::random_device rd2;
 std::mt19937 e23(rd2());
@@ -32,6 +32,8 @@ Flock::Flock(int numOfBoids) {
 }
 
 Flock::~Flock() {
+
+    //std::cout << "flcoks dead" << std::endl;
 
 }
 
@@ -60,7 +62,11 @@ void Flock::randomisePosition() {
 }
 
 void Flock::updateBoid() {
-    //Boids algorithm
+
+
+
+    std::thread::id this_id = std::this_thread::get_id();
+
 
 
 
@@ -76,45 +82,38 @@ void Flock::updateBoid() {
     v3(1)=0;
 
 
-    for (int i = 0; i < flock.size(); i++) {
+    for (auto &i : flock) {
 
         // Boids try to fly towards the centre of mass of neighbouring boids.
-        v1 = cohesion(flock[i]);
+        v1 = cohesion(i);
         //Boids try to keep a small distance away from other objects (including other boids).
-        v2 = separation(flock[i]);
+        v2 = separation(i);
         //Boids try to match velocity with near boids.
-        v3 = alignment(flock[i]);
+        v3 = alignment(i);
 
 
         //boid threads start here?
 
 
-        flock[i]->setVelocity(flock[i]->getVelocity() + v1 + v2 + v3);
-        limitSpeed(flock[i]);
+        i->setVelocity(i->getVelocity() + v1 + v2 + v3);
+        limitSpeed(i);
 
 
         //threading starts here!!
-        Vector2f sendPosition = flock[i]->getPosition() + flock[i]->getVelocity();
-        thread.push_back(new std::thread(init_thread , flock[i], sendPosition));
+        Vector2f sendPosition = i->getPosition() + i->getVelocity();
+        thread.push_back(new std::thread(init_thread , i, sendPosition));
 
 
        // flock[i]->setPosition(flock[i]->getPosition() + flock[i]->getVelocity());
 
     }
 
-    //std::cout << "---------------------------"  << std::endl;
 
     for (auto &i : thread) {
-        //std::cout << "---------------------------"  << std::endl;
 
-        //join
         i->join();
-        //std::cout << "Size of the vector " << thread.size() << std::endl;
+
     }
-
-
-    //std::cout << "Size of the vector " << thread.size() << std::endl;
-
 
 
 
@@ -133,11 +132,11 @@ Eigen::Vector2f Flock::cohesion(Boid *boidj) {
 
     //boidsPosition.
 
-    for (int i = 0; i <flock.size(); i++){
+    for (auto &i : flock) {
 
 
-        if (flock[i] != boidj) {
-            otherBoidsPosition = flock[i]->getPosition();
+        if (i != boidj) {
+            otherBoidsPosition = i->getPosition();
             pcJ(0) += otherBoidsPosition(0);
             pcJ(1) += otherBoidsPosition(1);
             neighbour++;
@@ -167,17 +166,16 @@ Eigen::Vector2f Flock::separation(Boid *boidj) {
 
     Vector2f c;
     c(0)=0;
-    c(0)=0;
+    c(1)=0;
 
     Vector2f k;
     k(0) = 0.2;
     k(1) = 0.2;
 
-    for (int i=0; i<flock.size(); i++) {
-        if (flock[i] !=  boidj){
-            if ( (flock[i]->getPosition() - boidj->getPosition()).norm() < 0.05){
-                c = c - (flock[i]->getPosition() - boidj->getPosition());
-                //std::cout << c << std::endl;
+    for (auto &i : flock) {
+        if (i !=  boidj){
+            if ( (i->getPosition() - boidj->getPosition()).norm() < 0.06){
+                c = c - (i->getPosition() - boidj->getPosition());
             }
         }
 
@@ -203,11 +201,11 @@ Eigen::Vector2f Flock::alignment(Boid *boidj) {
 
     //boidsPosition.
 
-    for (int i = 0; i <flock.size(); i++){
+    for (auto &i : flock) {
 
 
-        if (flock[i] != boidj) {
-            otherBoidsVelocity = flock[i]->getVelocity();
+        if (i != boidj) {
+            otherBoidsVelocity = i->getVelocity();
             pvJ(0) += otherBoidsVelocity(0);
             pvJ(1) += otherBoidsVelocity(1);
             neighbour++;
@@ -237,7 +235,7 @@ void Flock::limitSpeed(Boid *boid) {
   // For a limiting speed vlim:
 
    // PROCEDURE limit_velocity(Boid b)
-    float vlim = 0.009;
+    float vlim = 0.008;
     Vector2f newVelocity = boid->getVelocity();
 
 

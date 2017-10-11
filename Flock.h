@@ -20,8 +20,12 @@ private:
     static float rgb;
     std::vector<std::thread* >thread;
     int rc;
+    //std::mutex g_display_mutex;
+
 
 public:
+
+
     Flock(int numOfBoids);
 
     virtual ~Flock();
