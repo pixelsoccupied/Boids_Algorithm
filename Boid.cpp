@@ -158,6 +158,7 @@ void Boid::drawBoid() {
     float det = (velocity(1)*position(0)) - (velocity(0)*position(1));
     float rad = atan2(det, dot);*/
 
+/*
 
 
     float result = (atan (abs(velocity(1))/abs(velocity(0)))) + (270 * (3.141592653589793238462643383279502884197169399375105820/180));
@@ -171,6 +172,7 @@ void Boid::drawBoid() {
     glRotatef(degrees, 0.0, 0.0, 1.0);
     glTranslatef(-x, -y, 0);
 
+*/
 
 
     glColor3f(r, g, b);

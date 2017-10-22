@@ -8,7 +8,7 @@
 #include "Flock.h"
 using namespace Eigen;
 
-float Flock::rgb = 0.015;
+float Flock::rgb = 0.15;
 
 std::random_device rd2;
 std::mt19937 e23(rd2());
@@ -105,7 +105,6 @@ void Flock::updateBoid() {
 
 
        // flock[i]->setPosition(flock[i]->getPosition() + flock[i]->getVelocity());
-
     }
 
 

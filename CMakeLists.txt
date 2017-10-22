@@ -9,8 +9,8 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/local/lib)
 link_directories(/usr/local/lib)
 
-set(CMAKE_C_FLAGS “${CMAKE_C_FLAGS} -fopenmp -ltbb”)
-find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+#set(CMAKE_C_FLAGS “${CMAKE_C_FLAGS} -fopenmp -ltbb”)
+#find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
 
 
 find_package(Eigen3 REQUIRED)

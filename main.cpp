@@ -15,12 +15,12 @@ int main() {
     Flock flock2(10);
     Flock flock3(14);
     Flock flock4(16);
-    Flock flock5(20);
+  /*  Flock flock5(20);
     Flock flock6(10);
     Flock flock7(14);
-    Flock flock8(16);
+    Flock flock8(16);*/
 
-    std::vector <Flock> flocks= {flock, flock2, flock3, flock4, flock5, flock6, flock7, flock8};
+    std::vector <Flock> flocks= {flock, flock2, flock3, flock4};
 
     //flock.randomisePosition();
 
